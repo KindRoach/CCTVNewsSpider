@@ -11,12 +11,23 @@ namespace CCTVNewsSpider
     {
         static void Main(string[] args)
         {
-            var newsList = TaskManager.AssignAndPerformTask().OrderBy(x => x.Date);
-            var dataFolder = new DirectoryInfo("cctc_news");
+            var newsList = TaskManager.AssignAndPerformTask();
+
+            var dataFolder = new DirectoryInfo(@"..\..\cctc_news");
             if (!dataFolder.Exists) dataFolder.Create();
             foreach (var news in newsList)
             {
-                File.Create(Path.Combine(dataFolder))
+                var file = File.OpenWrite(Path.Combine(dataFolder.FullName, news.Date.ToShortDateString().Replace('/', '_') + ".txt"));
+                using (var sw = new StreamWriter(file))
+                {
+                    sw.WriteLine(news.Date.ToLongDateString());
+                    sw.WriteLine(news.Content);
+                }
+            }
+
+            using (var sw = new StreamWriter(Path.Combine(dataFolder.FullName, "ErrorUri.txt")))
+            {
+                ParserTools.ErrorUris.ForEach(x => sw.WriteLine(x.OriginalString));
             }
         }
     }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -39,12 +40,20 @@ namespace CCTVNewsSpider
             // 解析新闻页面
             var customer = new Task(() =>
             {
-                var NewsPageTasks = new List<Task>();
+                var newsPageTasks = new List<Task>();
                 while (!newsPages.IsCompleted)
                 {
-                    NewsPageTasks.Add(PageParser.ParseNewsPage(newsPages.Take(), result));
+                    try
+                    {
+                        var task = PageParser.ParseNewsPage(newsPages.Take(), result);
+                        newsPageTasks.Add(task);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
                 }
-                Task.WaitAll(NewsPageTasks.ToArray());
+                Task.WaitAll(newsPageTasks.ToArray());
             });
 
             producer.Start();
@@ -52,7 +61,6 @@ namespace CCTVNewsSpider
             Task.WaitAll(producer, customer);
 
             return result.ToList();
-
         }
     }
 }
