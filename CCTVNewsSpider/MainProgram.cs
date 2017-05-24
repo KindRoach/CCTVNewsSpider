@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +11,13 @@ namespace CCTVNewsSpider
     {
         static void Main(string[] args)
         {
-            PageParser.ParsePage(new Uri(@"http://mrxwlb.com/2017%E5%B9%B45%E6%9C%8823%E6%97%A5%E6%96%B0%E9%97%BB%E8%81%94%E6%92%AD%E6%96%87%E5%AD%97%E7%89%88/")).Wait();
+            var newsList = TaskManager.AssignAndPerformTask().OrderBy(x => x.Date);
+            var dataFolder = new DirectoryInfo("cctc_news");
+            if (!dataFolder.Exists) dataFolder.Create();
+            foreach (var news in newsList)
+            {
+                File.Create(Path.Combine(dataFolder))
+            }
         }
     }
 }
