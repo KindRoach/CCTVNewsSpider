@@ -11,6 +11,8 @@ namespace CCTVNewsSpider
     {
         static void Main(string[] args)
         {
+            var before = DateTime.Now;
+
             var newsList = TaskManager.AssignAndPerformTask();
 
             var dataFolder = new DirectoryInfo(@"..\..\cctc_news");
@@ -29,6 +31,9 @@ namespace CCTVNewsSpider
             {
                 ParserTools.ErrorUris.ForEach(x => sw.WriteLine(x.OriginalString));
             }
+
+            var after = DateTime.Now;
+            Console.WriteLine(after - before);
         }
     }
 }

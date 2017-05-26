@@ -27,8 +27,9 @@ namespace CCTVNewsSpider
                 var catalogPageUri = new Uri("http://mrxwlb.com/category/mrxwlb-text/");
                 Tuple<Uri, List<Uri>> tuple;
                 int count = 0;
-                while ((tuple = await PageParser.ParseCatalogPage(catalogPageUri)).Item1 != null)
+                while (catalogPageUri != null)
                 {
+                    tuple = await PageParser.ParseCatalogPage(catalogPageUri);
                     tuple.Item2.ForEach(x => newsPages.Add(x));
                     catalogPageUri = tuple.Item1;
                     Console.WriteLine($"{++count} CatalogPage done!");
