@@ -27,8 +27,9 @@ namespace CCTVNewsSpider
                 var catalogPageUri = new Uri("http://mrxwlb.com/category/mrxwlb-text/");
                 Tuple<Uri, List<Uri>> tuple;
                 int count = 0;
-                while ((tuple = await PageParser.ParseCatalogPage(catalogPageUri)).Item1 != null)
+                while (catalogPageUri != null)
                 {
+                    tuple = await PageParser.ParseCatalogPage(catalogPageUri);
                     tuple.Item2.ForEach(x => newsPages.Add(x));
                     catalogPageUri = tuple.Item1;
                     Console.WriteLine($"{++count} CatalogPage done!");
@@ -40,20 +41,17 @@ namespace CCTVNewsSpider
             // 解析新闻页面
             var customer = new Task(() =>
             {
-                var newsPageTasks = new List<Task>();
                 while (!newsPages.IsCompleted)
                 {
                     try
                     {
-                        var task = PageParser.ParseNewsPage(newsPages.Take(), result);
-                        newsPageTasks.Add(task);
+                        PageParser.ParseNewsPage(newsPages.Take(), result).Wait();
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine(e);
                     }
                 }
-                Task.WaitAll(newsPageTasks.ToArray());
             });
 
             producer.Start();
